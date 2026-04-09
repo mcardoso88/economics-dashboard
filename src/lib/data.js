@@ -1,0 +1,129 @@
+import Papa from 'papaparse'
+import { CSV_PATH } from './config'
+
+// ============================================================================
+// Data layer — CSV loading, filtering, ranking
+// ============================================================================
+
+/**
+ * Load and parse the combined CSV. Returns an array of typed row objects.
+ *
+ * Each row has shape:
+ *   { Year, Geo, Age, Gender, Major_Field_code, Major_Field_description,
+ *     Highest_Degree, Employment_Rate, Unemployment_Rate,
+ *     Median_Income, Average_Income }
+ */
+export async function loadData() {
+  const res = await fetch(CSV_PATH)
+  if (!res.ok) {
+    throw new Error(`Failed to fetch CSV (${res.status} ${res.statusText})`)
+  }
+  const text = await res.text()
+
+  const parsed = Papa.parse(text, {
+    header: true,
+    dynamicTyping: true,
+    skipEmptyLines: true,
+    transformHeader: (h) => h.trim(),
+  })
+
+  if (parsed.errors && parsed.errors.length) {
+    // Log but don't crash — PapaParse sometimes reports benign trailing rows
+    console.warn('CSV parse warnings:', parsed.errors)
+  }
+
+  // Keep only rows with required fields
+  return parsed.data.filter(
+    (r) =>
+      r &&
+      r.Major_Field_code != null &&
+      r.Major_Field_description != null &&
+      r.Gender != null
+  )
+}
+
+/**
+ * Filter rows by the current Geo / Age / Gender selection.
+ */
+export function filterRows(rows, { geo, age, gender }) {
+  return rows.filter(
+    (r) => r.Geo === geo && r.Age === age && r.Gender === gender
+  )
+}
+
+/**
+ * Get unique degrees (one row per field of study) in the order they appear
+ * in the CSV — which is the national popularity ranking from the source.
+ */
+export function getDegreeList(rows) {
+  const seen = new Set()
+  const list = []
+  for (const r of rows) {
+    const code = String(r.Major_Field_code)
+    if (!seen.has(code)) {
+      seen.add(code)
+      list.push({
+        code,
+        name: r.Major_Field_description,
+      })
+    }
+  }
+  return list
+}
+
+/**
+ * Add a `rank` field to each row for the given metric, where rank 1 is the
+ * highest value. `direction` controls whether high = rank 1 ("desc") or
+ * low = rank 1 ("asc"). Returns a new array sorted by rank.
+ *
+ * For ties, rows share the same rank (standard competition ranking).
+ */
+export function rankByMetric(rows, metric, direction = 'desc') {
+  const sorted = [...rows].sort((a, b) => {
+    const av = Number(a[metric])
+    const bv = Number(b[metric])
+    return direction === 'desc' ? bv - av : av - bv
+  })
+
+  let lastVal = null
+  let lastRank = 0
+  return sorted.map((r, i) => {
+    const v = Number(r[metric])
+    const rank = v === lastVal ? lastRank : i + 1
+    lastVal = v
+    lastRank = rank
+    return { ...r, rank, total: sorted.length }
+  })
+}
+
+/**
+ * Convenience: find a specific degree by CIP code within a filtered row set.
+ */
+export function findByCode(rows, code) {
+  return rows.find((r) => String(r.Major_Field_code) === String(code)) || null
+}
+
+/**
+ * Format helpers.
+ */
+export const fmt = {
+  money0: (v) =>
+    v == null || Number.isNaN(Number(v))
+      ? '—'
+      : `$${Math.round(Number(v)).toLocaleString('en-CA')}`,
+  money0short: (v) => {
+    if (v == null || Number.isNaN(Number(v))) return '—'
+    const n = Number(v)
+    if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`
+    return `$${n}`
+  },
+  pct1: (v) =>
+    v == null || Number.isNaN(Number(v)) ? '—' : `${Number(v).toFixed(1)}%`,
+  ordinal: (n) => {
+    const s = ['th', 'st', 'nd', 'rd']
+    const v = n % 100
+    return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`
+  },
+  shortName: (name, max = 45) =>
+    name && name.length > max ? name.slice(0, max - 1) + '…' : name,
+}
