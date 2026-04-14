@@ -22,7 +22,7 @@ export const FEATURED_CODE = '45.06'
 export const FEATURED_NAME = 'Economics'
 
 // Dashboard title and subtitle. The featured name is injected dynamically.
-export const TITLE = `Employment Outcomes by Field of Study: Where does ${FEATURED_NAME} stand?`
+export const TITLE = `Employment Outcomes by Field of Study: Where Does ${FEATURED_NAME} Stand?`
 export const SUBTITLE =
   "Exploring labour market outcomes for Canadian bachelor's degree holders by field of study. " +
   'Source: Statistics Canada, 2021 Census (Table 98-10-0409-01).'

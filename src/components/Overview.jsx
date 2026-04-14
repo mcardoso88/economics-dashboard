@@ -68,14 +68,10 @@ export default function Overview({ filtered, filters }) {
           Among the {total} most popular bachelor's degrees,{' '}
           <span className="font-semibold text-brock-navy">{FEATURED_NAME}</span>{' '}
           ranks{' '}
-          <RankPhrase rank={m.rank} total={total} metric="median income" />,
-          {' '}
-          <RankPhrase
-            rank={e.rank}
-            total={total}
-            metric="employment rate"
-          />
-          , and{' '}
+          <RankPhrase rank={a.rank} total={total} metric="average income" />,{' '}
+          <RankPhrase rank={m.rank} total={total} metric="median income" />,{' '}
+          <RankPhrase rank={e.rank} total={total} metric="employment rate" />,
+          {' '}and{' '}
           <RankPhrase
             rank={u.rank}
             total={total}
