@@ -65,7 +65,7 @@ export default function Overview({ filtered, filters }) {
 
       <div className="card p-6 sm:p-8">
         <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-          Among the {total} most popular bachelor's degrees in Canada,{' '}
+          Among the {total} most popular bachelor's degrees,{' '}
           <span className="font-semibold text-brock-navy">{FEATURED_NAME}</span>{' '}
           ranks{' '}
           <RankPhrase rank={m.rank} total={total} metric="median income" />,
@@ -79,9 +79,9 @@ export default function Overview({ filtered, filters }) {
           <RankPhrase
             rank={u.rank}
             total={total}
-            metric="unemployment rate (lowest = best)"
-          />
-          .
+            metric="unemployment rate"
+          />{' '}
+          in {filters.geo}.
         </p>
 
         <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -112,7 +112,6 @@ export default function Overview({ filtered, filters }) {
             rank={u.rank}
             total={total}
             tone="navy"
-            rankSuffix=" (lowest)"
           />
         </div>
       </div>

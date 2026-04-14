@@ -1,6 +1,7 @@
 import DegreePicker from './DegreePicker'
+import AverageIncomeBarChart from './AverageIncomeBarChart'
 import IncomeBarChart from './IncomeBarChart'
-import EmploymentBarChart from './EmploymentBarChart'
+import UnemploymentBarChart from './UnemploymentBarChart'
 import GenderPayGap from './GenderPayGap'
 
 export default function Explorer({
@@ -51,12 +52,20 @@ export default function Explorer({
       </div>
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AverageIncomeBarChart
+          filtered={filtered}
+          selectedCode={selectedCode}
+          compareCode={compareMode ? compareCode : null}
+        />
         <IncomeBarChart
           filtered={filtered}
           selectedCode={selectedCode}
           compareCode={compareMode ? compareCode : null}
         />
-        <EmploymentBarChart
+      </div>
+
+      <div className="mt-6">
+        <UnemploymentBarChart
           filtered={filtered}
           selectedCode={selectedCode}
           compareCode={compareMode ? compareCode : null}
