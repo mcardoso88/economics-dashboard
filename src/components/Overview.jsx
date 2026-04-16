@@ -82,13 +82,6 @@ export default function Overview({ filtered, filters }) {
 
         <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
           <RankCard
-            label="Median income"
-            value={fmt.money0(m.Median_Income)}
-            rank={m.rank}
-            total={total}
-            tone="red"
-          />
-          <RankCard
             label="Average income"
             value={fmt.money0(a.Average_Income)}
             rank={a.rank}
@@ -96,16 +89,23 @@ export default function Overview({ filtered, filters }) {
             tone="red"
           />
           <RankCard
-            label="Employment rate"
-            value={fmt.pct1(e.Employment_Rate)}
-            rank={e.rank}
+            label="Median income"
+            value={fmt.money0(m.Median_Income)}
+            rank={m.rank}
             total={total}
-            tone="navy"
+            tone="red"
           />
           <RankCard
             label="Unemployment rate"
             value={fmt.pct1(u.Unemployment_Rate)}
             rank={u.rank}
+            total={total}
+            tone="navy"
+          />
+          <RankCard
+            label="Employment rate"
+            value={fmt.pct1(e.Employment_Rate)}
+            rank={e.rank}
             total={total}
             tone="navy"
           />
