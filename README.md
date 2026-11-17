@@ -21,7 +21,7 @@ Statistics Canada, 2021 Census of Population:
 - [Table 98-10-0401-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810040101) — labour force status. Used to rank fields and for employment/unemployment rates.
 - [Table 98-10-0409-01](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810040901) — employment income. Median and average income for full-year, full-time workers in 2020.
 
-**Field selection (per degree level):** the top 50 four-digit CIP 2021 fields, ranked by the *Total - Labour force status* count (everyone whose highest credential is that degree) for Canada, ages 25–64, all genders. Catch-all `xx.99` "other" fields are dropped. Law (22.01) is excluded from the bachelor's list because it is usually a second degree. Rules live in `src/lib/selection.js`.
+**Field selection (per degree level):** the top 50 four-digit CIP 2021 fields, ranked by the *Total - Labour force status* count (everyone whose highest credential is that degree) for Canada, ages 25–64, all genders. Catch-all `xx.99` "other" fields are dropped. Law (LLB/JD, 22.01) is usually a second degree, so it is moved from the bachelor's list to the master's list. Its figures are StatCan's bachelor's-level numbers, and the `Source_Degree` column records this. Field definitions are on the [CIP Canada 2021](https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1420413) page. Rules live in `src/lib/selection.js`.
 
 ### Refreshing the data
 

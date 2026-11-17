@@ -27,6 +27,7 @@ import {
   INCOME_SLICE,
   EXCLUDE_OTHER_CATCHALLS,
   EXCLUDED_FIELDS,
+  CROSS_LEVEL_FIELDS,
 } from '../src/lib/selection.js'
 
 const WDS = 'https://www150.statcan.gc.ca/t1/wds/rest'
@@ -145,20 +146,30 @@ function eligibleFields(cube) {
 }
 
 async function rankFields(labour, fields, degree) {
-  const fixed = {
-    geo: memberId(labour, 'geo', RANKING_SLICE.geo),
-    lfs: memberId(labour, 'lfs', RANKING_SLICE.labourForceStatus),
-    age: memberId(labour, 'age', RANKING_SLICE.age),
-    gender: memberId(labour, 'gender', RANKING_SLICE.gender),
-    degree: memberId(labour, 'degree', degree),
-  }
-  const coords = fields.map((f) => coordinate(labour, { ...fixed, cip: f.id }))
-  const values = await fetchValues(labour.pid, coords)
   const excluded = EXCLUDED_FIELDS[degree] || {}
+  const crossLevel = CROSS_LEVEL_FIELDS[degree] || {}
 
-  return fields
+  // Each candidate carries the degree level its figures are pulled from:
+  // normally `degree`, or a different level for cross-level fields.
+  const candidates = fields
+    .filter((f) => !(f.code in excluded))
+    .map((f) => ({ ...f, sourceDegree: crossLevel[f.code]?.sourceDegree ?? degree }))
+
+  const coordFor = (f) =>
+    coordinate(labour, {
+      geo: memberId(labour, 'geo', RANKING_SLICE.geo),
+      lfs: memberId(labour, 'lfs', RANKING_SLICE.labourForceStatus),
+      age: memberId(labour, 'age', RANKING_SLICE.age),
+      gender: memberId(labour, 'gender', RANKING_SLICE.gender),
+      degree: memberId(labour, 'degree', f.sourceDegree),
+      cip: f.id,
+    })
+  const coords = candidates.map(coordFor)
+  const values = await fetchValues(labour.pid, coords)
+
+  return candidates
     .map((f, i) => ({ ...f, population: values.get(coords[i]) }))
-    .filter((f) => f.population != null && !(f.code in excluded))
+    .filter((f) => f.population != null)
     .sort((a, b) => b.population - a.population)
     .slice(0, TOP_N)
 }
@@ -192,7 +203,7 @@ async function main() {
       geo: memberId(labour, 'geo', c.geo),
       lfs: memberId(labour, 'lfs', lfsName),
       age: memberId(labour, 'age', c.age),
-      degree: memberId(labour, 'degree', c.degree),
+      degree: memberId(labour, 'degree', c.field.sourceDegree),
       cip: c.field.id,
       gender: memberId(labour, 'gender', c.gender),
     })
@@ -203,7 +214,7 @@ async function main() {
       geo: memberId(income, 'geo', c.geo),
       gender: memberId(income, 'gender', c.gender),
       age: memberId(income, 'age', c.age),
-      degree: memberId(income, 'degree', c.degree),
+      degree: memberId(income, 'degree', c.field.sourceDegree),
       work: memberId(income, 'work', INCOME_SLICE.workActivity),
       year: memberId(income, 'year', INCOME_SLICE.incomeYear),
       cip: cipId,
@@ -226,7 +237,7 @@ async function main() {
 
   const header = [
     'Year', 'Geo', 'Age', 'Gender', 'Major_Field_code', 'Major_Field_description',
-    'Highest_Degree', 'Popularity_Rank', 'Ranking_Population',
+    'Highest_Degree', 'Source_Degree', 'Popularity_Rank', 'Ranking_Population',
     'Employment_Rate', 'Unemployment_Rate', 'Median_Income', 'Average_Income',
   ]
   const esc = (v) => {
@@ -240,7 +251,7 @@ async function main() {
     missing += vals.filter((v) => v == null).length
     return [
       CENSUS_YEAR, c.geo, c.age, c.gender, c.field.code, c.field.name,
-      c.degree, c.rank, c.field.population, ...vals,
+      c.degree, c.field.sourceDegree, c.rank, c.field.population, ...vals,
     ].map(esc).join(',')
   })
 
@@ -250,7 +261,10 @@ async function main() {
   for (const degree of DEGREE_OPTIONS) {
     console.log(`\nTop ${TOP_N} — ${degree}:`)
     top[degree].forEach((f, i) =>
-      console.log(`  ${String(i + 1).padStart(2)}. ${f.code} ${f.name} (${f.population.toLocaleString('en-CA')})`)
+      console.log(
+        `  ${String(i + 1).padStart(2)}. ${f.code} ${f.name} (${f.population.toLocaleString('en-CA')})` +
+          (f.sourceDegree !== degree ? `  [figures: ${f.sourceDegree}]` : '')
+      )
     )
   }
 }

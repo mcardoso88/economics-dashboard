@@ -6,6 +6,8 @@ import {
   DEGREE_OPTIONS,
   DEGREE_LABELS,
   EXCLUDED_FIELDS,
+  CROSS_LEVEL_FIELDS,
+  CIP_URL,
 } from '../lib/selection'
 import { AGE_LABELS } from '../lib/config'
 
@@ -13,78 +15,81 @@ import { AGE_LABELS } from '../lib/config'
 // the data pipeline uses — so it stays accurate if the rules change.
 export default function Notes() {
   const exclusions = DEGREE_OPTIONS.flatMap((deg) =>
-    Object.entries(EXCLUDED_FIELDS[deg] || {}).map(([code, reason]) => ({
+    Object.keys(EXCLUDED_FIELDS[deg] || {}).map((code) => ({ deg, code }))
+  )
+  const crossLevel = DEGREE_OPTIONS.flatMap((deg) =>
+    Object.entries(CROSS_LEVEL_FIELDS[deg] || {}).map(([code, f]) => ({
       deg,
       code,
-      reason,
+      ...f,
     }))
   )
+  const lower = (deg) => DEGREE_LABELS[deg].toLowerCase()
 
   return (
-    <section className="mt-16 pt-8 border-t border-slate-200">
+    <section className="mt-12 pt-5 border-t border-slate-200">
       <h2 className="section-title">Notes</h2>
-      <ul className="mt-3 space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed list-disc pl-5 max-w-4xl">
+      <ul className="mt-2 space-y-1 text-[11px] sm:text-xs text-slate-500 leading-snug list-disc pl-4 max-w-5xl">
         <li>
-          <strong className="text-slate-800">Data.</strong> Statistics Canada,
-          2021 Census of Population. Employment and unemployment rates come from
-          Table <TableLink t={TABLES.labour} />; median and average employment
-          income come from Table <TableLink t={TABLES.income} />.
+          <Term>Data:</Term> Statistics Canada, 2021 Census. Rates from{' '}
+          <Link href={TABLES.labour.url}>{TABLES.labour.id}</Link>; income
+          from <Link href={TABLES.income.url}>{TABLES.income.id}</Link>.
         </li>
         <li>
-          <strong className="text-slate-800">Which fields are shown.</strong>{' '}
-          For each degree level, the dashboard shows the {TOP_N} detailed
-          (4-digit CIP 2021) fields of study with the most people whose highest
-          credential is that degree. Fields are ranked by the{' '}
-          <em>{RANKING_SLICE.labourForceStatus}</em> count in{' '}
-          {TABLES.labour.id}, which counts everyone with the degree whether or
-          not they are in the labour force. The ranking uses{' '}
+          <Term>Fields shown:</Term> for each degree level, the top {TOP_N}{' '}
+          4-digit fields of study (<Link href={CIP_URL}>CIP 2021</Link>; see
+          the link for field definitions and the programs each includes),
+          ranked by everyone whose highest credential is that degree (
+          {TABLES.labour.id} “{RANKING_SLICE.labourForceStatus}”,{' '}
           {RANKING_SLICE.geo}, ages {AGE_LABELS[RANKING_SLICE.age]}, all
-          genders. The same {TOP_N} fields are kept for every Region, Age and
-          Gender filter.
+          genders). The list stays the same across Region, Age and Gender.
         </li>
         <li>
-          <strong className="text-slate-800">Exclusions.</strong> Catch-all
-          “other” fields (CIP codes ending in .99) are left out.
-          {exclusions.map(({ deg, code, reason }) => (
+          <Term>Exclusions:</Term> catch-all “other” fields (xx.99)
+          {exclusions.map(({ deg, code }) => (
             <span key={`${deg}-${code}`}>
-              {' '}
-              CIP {code} is left out of the{' '}
-              {DEGREE_LABELS[deg].toLowerCase()} list: {reason}
+              ; {code} from the {lower(deg)} list (see below)
             </span>
-          ))}{' '}
-          When a field is left out, the next-ranked field takes its place.
+          ))}
+          . The next-ranked field takes their place.
+        </li>
+        {crossLevel.map(({ deg, code, reason }) => (
+          <li key={`${deg}-${code}`}>
+            <Term>
+              {code} in the {lower(deg)} list:
+            </Term>{' '}
+            {reason}
+          </li>
+        ))}
+        <li>
+          <Term>Degree level</Term> is the <em>highest</em> credential held. A
+          person with a bachelor’s and a master’s counts only under master’s, in
+          that degree’s field.
         </li>
         <li>
-          <strong className="text-slate-800">Degree level.</strong> A degree
-          level means the person’s <em>highest</em> credential. Someone with
-          both a bachelor’s and a master’s appears only under Master’s, with the
-          field of study of that master’s degree.
-        </li>
-        <li>
-          <strong className="text-slate-800">Rates.</strong> The employment
-          rate is the share of everyone with the credential who is employed.
-          The unemployment rate is the share of labour force participants who
-          are unemployed. Both refer to the Census reference week in May 2021.
-        </li>
-        <li>
-          <strong className="text-slate-800">Income.</strong> Median and
-          average employment income in {INCOME_SLICE.incomeYear}, for people
-          who worked full year, full time that year.
+          <Term>Rates:</Term> employment rate = employed ÷ everyone with the
+          credential; unemployment rate = unemployed ÷ labour force. Both refer
+          to May 2021. <Term>Income:</Term> employment income in{' '}
+          {INCOME_SLICE.incomeYear} for those who worked full year, full time.
         </li>
       </ul>
     </section>
   )
 }
 
-function TableLink({ t }) {
+function Term({ children }) {
+  return <strong className="font-semibold text-slate-700">{children}</strong>
+}
+
+function Link({ href, children }) {
   return (
     <a
-      href={t.url}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="underline hover:text-brock-navy"
     >
-      {t.id}
+      {children}
     </a>
   )
 }

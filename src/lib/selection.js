@@ -55,12 +55,30 @@ export const INCOME_SLICE = {
 // catch-all fields are dropped.
 export const EXCLUDE_OTHER_CATCHALLS = true
 
+// CIP Canada 2021 classification — field definitions and the 6-digit
+// programs inside each 4-digit field.
+export const CIP_URL =
+  'https://www23.statcan.gc.ca/imdb/p3VD.pl?Function=getVD&TVD=1420413'
+
+// Fields shown under a degree level other than the one StatCan codes them
+// at. Figures come from `sourceDegree`; the field is ranked into the target
+// list by that population. { targetDegree: { code: { sourceDegree, reason } } }
+export const CROSS_LEVEL_FIELDS = {
+  "Master's degree": {
+    '22.01': {
+      sourceDegree: "Bachelor's degree",
+      reason:
+        'the Census codes LLB/JD holders as having a bachelor’s degree, but law is a second-entry professional degree, so it is shown with master’s degrees using the bachelor’s-level figures. Post-LLB/JD law degrees (e.g. LLM) remain a separate field, 22.02.',
+    },
+  },
+}
+
 // Field-specific exclusions per degree level: { code: reason }.
 // Excluded fields are skipped and the next-ranked field takes their place.
 export const EXCLUDED_FIELDS = {
   "Bachelor's degree": {
     '22.01':
-      'Law (LLB, JD, BCL) is usually earned as a second degree after another bachelor’s, so it is not comparable to first-entry bachelor’s programs.',
+      'Law (LLB, JD, BCL) is usually earned as a second degree, so it is shown with master’s degrees instead.',
   },
   "Master's degree": {},
 }
