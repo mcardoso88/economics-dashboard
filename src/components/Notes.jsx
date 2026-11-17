@@ -31,9 +31,11 @@ export default function Notes() {
       <h2 className="section-title">Notes</h2>
       <ul className="mt-2 space-y-1 text-[11px] sm:text-xs text-slate-500 leading-snug list-disc pl-4 max-w-5xl">
         <li>
-          <Term>Data:</Term> Statistics Canada, 2021 Census. Rates from{' '}
-          <Link href={TABLES.labour.url}>{TABLES.labour.id}</Link>; income
-          from <Link href={TABLES.income.url}>{TABLES.income.id}</Link>.
+          <Term>Data:</Term> Statistics Canada, 2021 Census of Population.
+          Employment and unemployment rates come from Table{' '}
+          <Link href={TABLES.labour.url}>{TABLES.labour.id}</Link>; median and
+          average employment income come from Table{' '}
+          <Link href={TABLES.income.url}>{TABLES.income.id}</Link>.
         </li>
         <li>
           <Term>Fields shown:</Term> for each degree level, the top {TOP_N}{' '}
