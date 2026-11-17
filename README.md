@@ -73,7 +73,7 @@ Most things you'd want to change live in `src/lib/config.js`:
 | Want to change…                  | Edit                                    |
 |----------------------------------|-----------------------------------------|
 | Featured degree (currently Econ) | `FEATURED_CODE`, `FEATURED_NAME`        |
-| Dashboard title                  | `TITLE`, `SUBTITLE`                     |
+| Dashboard title                  | `TITLE`                                 |
 | Default filters on load          | `DEFAULT_FILTERS`                       |
 | Brand colors                     | `COLORS` + `tailwind.config.js`         |
 | Degree levels, regions, ages, top-N, exclusions | `src/lib/selection.js`, then `npm run fetch-data` |

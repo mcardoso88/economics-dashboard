@@ -21,10 +21,8 @@ export const COLORS = {
 export const FEATURED_CODE = '45.06'
 export const FEATURED_NAME = 'Economics'
 
-// Dashboard title and subtitle. The featured name is injected dynamically.
-export const TITLE = `Employment Outcomes by Field of Study: Where Does ${FEATURED_NAME} Stand?`
-export const SUBTITLE =
-  "Exploring labour market outcomes for Canadian bachelor's and master's degree holders by field of study."
+// Dashboard title. The featured name is injected dynamically.
+export const TITLE = `Why study ${FEATURED_NAME}? Exploring labour market outcomes for Canadian degree holders by field of study`
 
 // Default filter state on first load
 export const DEFAULT_FILTERS = {
