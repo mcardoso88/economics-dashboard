@@ -1,4 +1,5 @@
-import { TITLE } from '../lib/config'
+import { TITLE, SUBTITLE } from '../lib/config'
+import { TABLES } from '../lib/selection'
 
 export default function Header() {
   return (
@@ -14,9 +15,10 @@ export default function Header() {
           {TITLE}
         </h1>
         <p className="mt-4 text-sm sm:text-base text-white/75 max-w-3xl leading-relaxed">
-          Exploring labour market outcomes for Canadian bachelor's degree holders by field of study.
+          {SUBTITLE}
           <br />
-          Source: Statistics Canada, 2021 Census (Table 98-10-0409-01).
+          Source: Statistics Canada, 2021 Census (Tables {TABLES.labour.id} and{' '}
+          {TABLES.income.id}).
         </p>
       </div>
     </header>

@@ -2,8 +2,10 @@ import {
   GEO_OPTIONS,
   AGE_OPTIONS,
   GENDER_OPTIONS,
+  DEGREE_OPTIONS,
   AGE_LABELS,
   GENDER_LABELS,
+  DEGREE_LABELS,
 } from '../lib/config'
 
 export default function FilterBar({ filters, onChange }) {
@@ -13,7 +15,7 @@ export default function FilterBar({ filters, onChange }) {
   return (
     <section className="mt-8">
       <div className="card p-4 sm:p-5">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Field label="Region">
             <select
               className="select"
@@ -49,6 +51,19 @@ export default function FilterBar({ filters, onChange }) {
               {GENDER_OPTIONS.map((o) => (
                 <option key={o} value={o}>
                   {GENDER_LABELS[o]}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Degree level">
+            <select
+              className="select"
+              value={filters.degree}
+              onChange={update('degree')}
+            >
+              {DEGREE_OPTIONS.map((o) => (
+                <option key={o} value={o}>
+                  {DEGREE_LABELS[o]}
                 </option>
               ))}
             </select>

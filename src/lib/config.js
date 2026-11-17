@@ -24,20 +24,25 @@ export const FEATURED_NAME = 'Economics'
 // Dashboard title and subtitle. The featured name is injected dynamically.
 export const TITLE = `Employment Outcomes by Field of Study: Where Does ${FEATURED_NAME} Stand?`
 export const SUBTITLE =
-  "Exploring labour market outcomes for Canadian bachelor's degree holders by field of study. " +
-  'Source: Statistics Canada, 2021 Census (Table 98-10-0409-01).'
+  "Exploring labour market outcomes for Canadian bachelor's and master's degree holders by field of study."
 
 // Default filter state on first load
 export const DEFAULT_FILTERS = {
   geo: 'Canada',
   age: '25 to 64 years',
   gender: 'Total - Gender',
+  degree: "Bachelor's degree",
 }
 
-// Option lists (must match exact CSV values)
-export const GEO_OPTIONS = ['Canada', 'Ontario']
-export const AGE_OPTIONS = ['25 to 64 years', '25 to 34 years', '35 to 44 years']
-export const GENDER_OPTIONS = ['Total - Gender', 'Men+', 'Women+']
+// Option lists (exact CSV values) live in selection.js, which the data
+// pipeline also reads — re-exported here for the UI.
+export {
+  GEO_OPTIONS,
+  AGE_OPTIONS,
+  GENDER_OPTIONS,
+  DEGREE_OPTIONS,
+  DEGREE_LABELS,
+} from './selection'
 
 // Human-readable labels for dropdowns
 export const GENDER_LABELS = {

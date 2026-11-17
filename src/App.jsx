@@ -3,6 +3,7 @@ import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import Overview from './components/Overview'
 import Explorer from './components/Explorer'
+import Notes from './components/Notes'
 import { loadData, filterRows, getDegreeList } from './lib/data'
 import { DEFAULT_FILTERS, FEATURED_CODE } from './lib/config'
 
@@ -38,21 +39,35 @@ export default function App() {
     [rows, filters]
   )
 
-  // Cross-gender slice: same Geo + Age, but ALL genders (150 rows).
-  // Used by the GenderPayGap chart which always needs Men+/Women+
-  // regardless of the current Gender filter.
+  // Cross-gender slice: same Geo + Age + Degree level, but ALL genders
+  // (150 rows). Used by the GenderPayGap chart which always needs
+  // Men+/Women+ regardless of the current Gender filter.
   const crossGender = useMemo(() => {
     if (!rows) return []
     return rows.filter(
-      (r) => r.Geo === filters.geo && r.Age === filters.age
+      (r) =>
+        r.Geo === filters.geo &&
+        r.Age === filters.age &&
+        r.Highest_Degree === filters.degree
     )
-  }, [rows, filters.geo, filters.age])
+  }, [rows, filters.geo, filters.age, filters.degree])
 
-  // Degree list is stable across filter changes (same 50 fields)
+  // The 50 fields differ by degree level but not by Geo / Age / Gender
   const degrees = useMemo(
-    () => (rows ? getDegreeList(rows) : []),
-    [rows]
+    () => (rows ? getDegreeList(rows, filters.degree) : []),
+    [rows, filters.degree]
   )
+
+  // Switching degree level can drop the selected field(s) from the list.
+  // Fall back to the featured degree (or the most common field) if so.
+  useEffect(() => {
+    if (!degrees.length) return
+    const has = (code) => degrees.some((d) => d.code === String(code))
+    if (!has(selectedCode)) {
+      setSelectedCode(has(FEATURED_CODE) ? FEATURED_CODE : degrees[0].code)
+    }
+    if (compareCode && !has(compareCode)) setCompareCode(null)
+  }, [degrees]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // When exiting compare mode, clear the second selection
   const handleCompareModeChange = (on) => {
@@ -105,22 +120,7 @@ export default function App() {
           onCompareModeChange={handleCompareModeChange}
         />
 
-        <footer className="mt-16 pt-8 border-t border-slate-200 text-xs text-slate-500">
-          <p>
-            Data source: Statistics Canada, 2021 Census of Population, Table{' '}
-            <a
-              href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810040901"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-brock-navy"
-            >
-              98-10-0409-01
-            </a>
-            . Income figures cover workers who worked full year, full time in 2020.
-            Employment and unemployment rates cover all labour force participants
-            with the specified credential.
-          </p>
-        </footer>
+        <Notes />
       </main>
     </div>
   )

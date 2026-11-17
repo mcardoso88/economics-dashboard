@@ -12,7 +12,7 @@ export default function EmploymentBarChart({
       metric="Employment_Rate"
       direction="desc"
       title="Employment rate"
-      subtitle="Share of bachelor's degree holders employed — ranked highest to lowest"
+      subtitle="Share of degree holders employed — ranked highest to lowest"
       formatValue={fmt.pct1}
       axisFormat={(v) => `${v}%`}
       selectedCode={selectedCode}

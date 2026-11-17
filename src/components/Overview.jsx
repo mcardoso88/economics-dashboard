@@ -4,6 +4,7 @@ import {
   FEATURED_NAME,
   AGE_LABELS,
   GENDER_LABELS,
+  DEGREE_LABELS,
 } from '../lib/config'
 import { rankByMetric, findByCode, fmt } from '../lib/data'
 
@@ -38,7 +39,8 @@ export default function Overview({ filtered, filters }) {
     return (
       <section className="mt-6">
         <div className="card p-6 text-sm text-slate-500">
-          {FEATURED_NAME} not found in the current filter slice.
+          {FEATURED_NAME} is not among the top {filtered.length}{' '}
+          {DEGREE_LABELS[filters.degree].toLowerCase()} fields of study.
         </div>
       </section>
     )
@@ -52,9 +54,9 @@ export default function Overview({ filtered, filters }) {
     unemp: u,
   } = insights
 
-  const scopeLabel = `${filters.geo} · ${AGE_LABELS[filters.age]} · ${
-    GENDER_LABELS[filters.gender]
-  }`
+  const scopeLabel = `${DEGREE_LABELS[filters.degree]} · ${filters.geo} · ${
+    AGE_LABELS[filters.age]
+  } · ${GENDER_LABELS[filters.gender]}`
 
   return (
     <section className="mt-6">
@@ -65,7 +67,8 @@ export default function Overview({ filtered, filters }) {
 
       <div className="card p-6 sm:p-8">
         <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-          Among the {total} most popular bachelor's degrees,{' '}
+          Among the {total} most common{' '}
+          {DEGREE_LABELS[filters.degree].toLowerCase()} degrees,{' '}
           <span className="font-semibold text-brock-navy">{FEATURED_NAME}</span>{' '}
           ranks{' '}
           <RankPhrase rank={a.rank} total={total} metric="average income" />,{' '}
